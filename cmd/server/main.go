@@ -36,7 +36,7 @@ func main() {
 	http.HandleFunc("GET /v1/getArticles", handler.GetArticles)
 	http.HandleFunc("GET /v1/getArticle/{id}", handler.GetArticle)
 	http.HandleFunc("POST /v1/createArticle", handler.CreateArticle)
-	// http.HandleFunc("DELETE /v1/deleteArticle/{id}", deleteArticle)
+	http.HandleFunc("DELETE /v1/deleteArticle/{id}", handler.DeleteArticle)
 	// http.HandleFunc("PATCH /v1/updateArticle/{id}", updateArticle)
 
 	log.Println("running on http://localhost:8000")

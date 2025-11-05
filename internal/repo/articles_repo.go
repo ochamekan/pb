@@ -15,10 +15,17 @@ type CreateArticleRequest struct {
 	Body  string `json:"body"`
 }
 
+type UpdateArticleRequest struct {
+	Title *string `json:"title"`
+	Body  *string `json:"body"`
+}
+
 type ArticlesRepository interface {
 	GetArticles(ctx context.Context) ([]models.Article, error)
 	GetArticle(ctx context.Context, id int) (models.Article, error)
 	CreateArticle(ctx context.Context, data CreateArticleRequest) (models.Article, error)
+	DeleteArticle(ctx context.Context, id int) error
+	UpdateArticle(ctx context.Context, id int, data UpdateArticleRequest) error
 }
 
 type articlesRepo struct {
@@ -65,4 +72,22 @@ func (r *articlesRepo) CreateArticle(ctx context.Context, data CreateArticleRequ
 		return models.Article{}, fmt.Errorf("error in %s: %s", fn, err)
 	}
 	return a, nil
+}
+
+func (r *articlesRepo) DeleteArticle(ctx context.Context, id int) error {
+	fn := "articlesRepo.DeleteArticle"
+	_, err := r.db.Exec(ctx, "DELETE FROM articles WHERE id = $1", id)
+	if err != nil {
+		return fmt.Errorf("error in %s: %s", fn, err)
+	}
+	return nil
+}
+
+func (r *articlesRepo) UpdateArticle(ctx context.Context, id int, data UpdateArticleRequest) error {
+	fn := "articlesRepo.UpdateArticle"
+	_, err := r.db.Exec(ctx, "", id)
+	if err != nil {
+		return fmt.Errorf("error in %s: %s", fn, err)
+	}
+	return nil
 }
