@@ -94,6 +94,27 @@ func (a *ArticlesHandler) DeleteArticle(w http.ResponseWriter, r *http.Request) 
 	err = a.repo.DeleteArticle(r.Context(), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (a *ArticlesHandler) UpdateArticle(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	var data repo.UpdateArticleRequest
+	err = json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	err = a.repo.UpdateArticle(r.Context(), id, data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 	w.WriteHeader(http.StatusNoContent)
 }

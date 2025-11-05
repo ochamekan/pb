@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -85,7 +86,29 @@ func (r *articlesRepo) DeleteArticle(ctx context.Context, id int) error {
 
 func (r *articlesRepo) UpdateArticle(ctx context.Context, id int, data UpdateArticleRequest) error {
 	fn := "articlesRepo.UpdateArticle"
-	_, err := r.db.Exec(ctx, "", id)
+	var clauses []string
+	var args []any
+	argIdx := 1
+
+	if data.Title != nil {
+		clauses = append(clauses, fmt.Sprintf("title = $%d", argIdx))
+		args = append(args, *data.Title)
+		argIdx++
+	}
+
+	if data.Body != nil {
+		clauses = append(clauses, fmt.Sprintf("body = $%d", argIdx))
+		args = append(args, *data.Body)
+		argIdx++
+	}
+
+	if len(clauses) == 0 {
+		return fmt.Errorf("error in %s: at least one field required", fn)
+	}
+	args = append(args, id)
+
+	query := fmt.Sprintf("UPDATE articles SET %s WHERE id = $%d", strings.Join(clauses, ", "), argIdx)
+	_, err := r.db.Exec(ctx, query, args...)
 	if err != nil {
 		return fmt.Errorf("error in %s: %s", fn, err)
 	}
