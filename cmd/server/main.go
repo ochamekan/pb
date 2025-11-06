@@ -8,7 +8,9 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 	"github.com/visualect/pb/internal/handlers"
+	"github.com/visualect/pb/internal/handlers/middleware"
 	"github.com/visualect/pb/internal/repo"
 )
 
@@ -31,14 +33,22 @@ func main() {
 	}
 
 	articlesRepo := repo.New(dbpool)
-	handler := handlers.New(articlesRepo)
+	h := handlers.New(articlesRepo)
 
-	http.HandleFunc("GET /v1/getArticles", handler.GetArticles)
-	http.HandleFunc("GET /v1/getArticle/{id}", handler.GetArticle)
-	http.HandleFunc("POST /v1/createArticle", handler.CreateArticle)
-	http.HandleFunc("DELETE /v1/deleteArticle/{id}", handler.DeleteArticle)
-	http.HandleFunc("PATCH /v1/updateArticle/{id}", handler.UpdateArticle)
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /v1/getArticles", h.GetArticles)
+	mux.HandleFunc("GET /v1/getArticle/{id}", h.GetArticle)
+	mux.HandleFunc("POST /v1/createArticle", middleware.AuthRequired(h.CreateArticle))
+	mux.HandleFunc("DELETE /v1/deleteArticle/{id}", middleware.AuthRequired(h.DeleteArticle))
+	mux.HandleFunc("PATCH /v1/updateArticle/{id}", middleware.AuthRequired(h.UpdateArticle))
+
+	c := cors.New(cors.Options{
+		AllowedMethods: []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodPatch},
+		AllowedHeaders: []string{"Authorization", "Content-Type"},
+		MaxAge:         86400,
+	})
+	handler := c.Handler(mux)
 
 	log.Println("running on http://localhost:8000")
-	log.Fatal(http.ListenAndServe(":8000", nil))
+	log.Fatal(http.ListenAndServe(":8000", handler))
 }

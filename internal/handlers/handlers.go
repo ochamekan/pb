@@ -25,6 +25,7 @@ func (a *ArticlesHandler) GetArticles(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "public, max-age=300")
 	err = json.NewEncoder(w).Encode(articles)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -44,6 +45,7 @@ func (a *ArticlesHandler) GetArticle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "public, max-age=3600")
 	err = json.NewEncoder(w).Encode(article)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -7,8 +7,6 @@ CREATE TABLE IF NOT EXISTS articles (
   body text NOT NULL,
   created_at timestamp DEFAULT now()
 );
-
-SELECT 'articles table succesfully created';
 -- +goose StatementEnd
 
 -- +goose Down
