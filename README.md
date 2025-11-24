@@ -1,7 +1,7 @@
 # pb (personal blog)
 
 *pb* is simple pet-project to demonstrate REST API knowledge.
-It uses *postgresql*, *pgx*, *standard libary* and *goose* for migrations.
+It uses *postgresql*, *pgx*, *standard library* and *goose* for migrations.
 
 ## Run with docker compose
 
